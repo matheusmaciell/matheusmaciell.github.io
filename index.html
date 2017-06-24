@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html ng-app=listaSeries>
+<head>
+	<title>Organizador de séries</title>
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width" />
+	<link rel="stylesheet" type="text/css" href="lib/angular/angular-material.min.css">
+	<link rel="stylesheet" type="text/css" href="lib/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="css/app.css">
+</head>
+<body ng-controller="listaSeriesCtrl">
+
+
+
+	<md-card>
+
+		<div ng-cloak>
+			<md-content>
+				<md-tabs md-dynamic-height md-border-bottom>
+
+					<md-tab label="Pagina inicial">
+
+						<form> 
+							<div class="input-group"> 
+								<input type="text" class="form-control" ng-model="nomeSerie" placeholder="Nome"> 
+								<div class="input-group-btn"> 
+									<button class="btn btn-default" type="submit" data-toggle="modal" ng-click="pesquisarSerie(nomeSerie)"  ng-disabled="!nomeSerie">
+										<i class="glyphicon glyphicon-search"></i> </button> 
+									</div> 
+								</div> 
+							</form>
+
+
+							<div  ng-repeat="serie in series" class="col-sm-6 col-md-4">
+
+
+
+								<div  layout="column" style="height: 700px;" >
+
+									<section layout="row" flex>
+
+										
+
+										<md-content flex layout-padding>
+
+											<div layout="column" layout-align="top center">
+
+
+												<div>
+
+
+													<a href="#informacoes" > <img data-toggle="modal"  src="{{serie.Poster}}" ng-click = "toggleLeft();buscaInfoSerie(serie.imdbID);"/></a>
+													<h3>
+														<button type="button" class="btn btn-info btn-lg" ng-click="addSerieWatch(serie)"  >Watchlist</button>
+														<button type="button" class="btn btn-info btn-lg" ng-click="addSeriePerfil(serie)" >Perfil</button> 
+													</h3>
+
+												</div>
+
+											</div>
+
+										</md-content>
+
+									</section>
+
+								</div>
+
+
+
+
+
+
+							</div>
+
+
+							
+
+
+						</md-tab>
+
+
+						<md-tab label="Perfil">
+
+							<div  ng-repeat="serie in minhasSeries" class="col-sm-6 col-md-4">
+
+
+
+								<div  layout="column" style="height: 700px;" >
+
+									<section layout="row" flex>
+
+
+
+										<md-content flex layout-padding>
+
+											<div layout="column" layout-align="top center">
+
+
+												<div>
+
+
+													<a href="#informacoes" ><img data-toggle="modal"  src="{{serie.Poster}}" ng-click = "toggleLeft();buscaInfoSerie(serie.imdbID);"/>
+													<button type="button" class="btn btn-info btn-lg" ng-click="removeSeriePerfil(serie)"  >remover</button>
+													</a>
+												</div>
+
+											</div>
+
+										</md-content>
+
+									</section>
+
+								</div>
+
+
+
+
+
+
+							</div>
+
+
+
+						</md-tab>
+
+
+						<md-tab label="Watchlist" >
+							<div  ng-repeat="serie in watchlist" class="col-sm-6 col-md-4">
+
+
+
+								<div  layout="column" style="height: 700px;" >
+
+									<section layout="row" flex>
+
+										
+
+										<md-content flex layout-padding>
+
+											<div layout="column" layout-align="top center">
+
+
+												<div>
+
+
+													<a href="#informacoes" > <img src="{{serie.Poster}}" ng-click = "toggleLeft();buscaInfoSerie(serie.imdbID);"/></a>
+													<h3>
+														<button type="button" class="btn btn-info btn-lg" ng-click="addSeriePerfil(serie)">Perfil</button>
+														
+													</h3>
+
+												</div>
+
+											</div>
+
+										</md-content>
+
+									</section>
+
+								</div>
+							</div>
+
+
+
+						</md-tab>
+					</md-tabs>
+
+				</md-content>
+			</div>
+		</md-card>
+		<div id="informacoes">
+			<md-sidenav class="md-sidenav-left" md-component-id="left"
+			md-disable-backdrop md-whiteframe="4">
+
+			<md-toolbar class="md-theme-indigo">
+				<h1 class="md-toolbar-tools">informações da séries</h1>
+			</md-toolbar>
+
+			<md-content class="dialog-demo-content" layout="row" layout-wrap layout-margin layout-align="center">
+				<p>
+
+					<h3>{{idSerieBuscada.Title}}</h3>
+					<img class="imagem" src="{{idSerieBuscada.Poster}}" /> 
+
+					<h3>sinopse:</h3>
+					<h4>{{idSerieBuscada.Plot}}</h4>
+
+					<h3>média do IMDb:</h3>
+					<h4>{{idSerieBuscada.imdbRating}}</h4>
+
+					<h3>classificação etária:</h3>
+					<h4>{{idSerieBuscada.Rated}}</h4>
+
+
+
+					<div ng-if="pertencePerfil(idSerieBuscada)">
+					
+					<h3>Sua nota:</h3>
+					<h4>{{serieDoPerfil.nota}}</h4>
+
+					<div class="input-group"> 
+								<input type="text" class="form-control" ng-model="notaSerie" placeholder="Nota"> 
+								<div class="input-group-btn"> 
+									<button class="btn btn-default" type="submit"  ng-click="addNota(idSerieBuscada,notaSerie)" ng-disabled="!notaSerie">
+										<i class="glyphicon glyphicon-circle-arrow-right"></i> </button> 
+									</div> 
+								</div>
+
+
+					<h3>Episódio assistido:</h3>
+					<h4>{{serieDoPerfil.episodio}}</h4>	
+					<div class="input-group"> 
+								<input type="text" class="form-control" ng-model="numeroEp" placeholder="Episódio"> 
+								<div class="input-group-btn"> 
+									<button class="btn btn-default" type="submit" ng-click="addEpisodio(idSerieBuscada,numeroEp)"  ng-disabled="!numeroEp">
+										<i class="glyphicon glyphicon-circle-arrow-right"></i> </button> 
+									</div> 
+								</div> 
+					
+			
+									
+
+					<hr>
+					</div>
+					
+
+				</p>
+				<md-button ng-click="toggleLeft()" class="md-accent">
+					Fechar
+				</md-button>
+			</md-content>
+
+		</md-sidenav>
+
+	</div>
+
+
+
+
+
+
+
+	<!-- colocados no fim do documento para carregamento mais rapido da pagina -->
+	<script src="lib/angular/angular.min.js"></script>
+	<script src="lib/angular/angular-material.min.js"></script>
+	<script src="lib/angular/angular-animate.min.js"></script>
+	<script src="lib/angular/angular-aria.min.js"></script>
+	<script src="lib/angular/angular-messages.min.js"></script>
+	<script src="js/app.js"></script>
+	<script src="js/controllers/listaSeriesCtrl.js"></script>
+</body>
+</html>
